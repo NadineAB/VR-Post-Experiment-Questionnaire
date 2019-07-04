@@ -6,18 +6,32 @@ var ACPToolKit = (function () {
         DataStorage.setItem('pid', pid);
     }
 
+    module.setCurrentType = function (exptype) {
+        DataStorage.setItem('exptype', exptype);
+    }
+
     module.getCurrentParticipantId = function () {
         var pid = DataStorage.getItem('pid');
-        if (!pid) {
+        if (!pid)
+        {
             alert('Current participant not set!');
             pid = prompt('Enter current participant ID:').toString();
             this.setCurrentParticipantId(pid);
         }
         return pid;
     }
+    module.getCurrentType= function () {
+        var exptype = DataStorage.getItem('exptype');
+        if (!exptype) {
+            alert('Current participant not set!');
+            exptype = prompt('Enter current experiment type:').toString();
+            this.setCurrentParticipantId(exptype);
+        }
+        return exptype;
+    }
 
     module.clearAllData = function () {
-        ['pid', 'pretest', 'trials', 'posttest'].forEach(function (key) {
+        ['pid', 'exptype', 'pretest', 'trials', 'posttest'].forEach(function (key) {
             DataStorage.removeItem(key);
         });
     }
@@ -26,17 +40,20 @@ var ACPToolKit = (function () {
         var headers = [];
         var data = [];
         var pid = ACPToolKit.getCurrentParticipantId();
+        var exptype = ACPToolKit.getCurrentType();
         formResponses.unshift({ name: 'pid', value: pid });
+        formResponses.unshift({ name: 'experiment type', value: exptype});
         formResponses.forEach(function (item) {
             headers.push(item.name);
             data.push(item.value);
         });
-        arrayToCSV([headers, data], 'acp-' + pid + '-' + type);
+        arrayToCSV([headers, data], 'acp-' + pid + '-' + 'group' + exptype + type);
     }
 
     module.downloadTrialResults = function (data) {
         var pid = ACPToolKit.getCurrentParticipantId();
-        arrayToCSV(data, 'acp-' + pid + '-trials');
+        var exptype = ACPToolKit.getCurrentParticipantId();
+        arrayToCSV(data, 'acp-' + pid + 'group' + exptype + '-trials');
     }
 
     function arrayToCSV (twoDiArray, fileName) {
@@ -65,8 +82,13 @@ var ACPToolKit = (function () {
     $(function () {
         // Populate interface with current participant's ID
         var $pidEl = $('.js-pid');
-        if ($pidEl.length > 0) {
+        if ($pidEl.length > 0)
+        {
            $pidEl.text(module.getCurrentParticipantId());
+        }
+        var $exptypeEl = $('.js-exptype');
+        if ($exptypeEl.length > 0) {
+           $exptypeEl.text(module.getCurrentType());
         }
     });
 
